@@ -1,11 +1,13 @@
-import { Controller, Post, Body, Put, Delete, Param, Get } from '@nestjs/common';
+import { Controller, Post, Body, Put, Delete, Param, Get, UseGuards, Request } from '@nestjs/common';
 import { WorkflowsService } from './workflows.service';
 import { CreateWorkflowDto } from './dto/createworkflow.dto';
 import { UpdateWorkflowDto } from './dto/updateworkflow.dto';
 import { CreateWorkflowStepDto } from './dto/workflowsteps.dto';
 import { CreateWorkflowStepEdgeDto } from './dto/workflow-step-edges.dto';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 
 @Controller('workflows')
+@UseGuards(JwtAuthGuard)
 export class WorkflowsController {
   constructor(private readonly workflowsService: WorkflowsService) {}
 

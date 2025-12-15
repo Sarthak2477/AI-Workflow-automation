@@ -1,11 +1,15 @@
 import { Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { SupabaseService } from '../../database/supabase.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly supabase: SupabaseService) {}
+  constructor(
+    private readonly supabase: SupabaseService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   async register(registerDto: RegisterDto) {
     const { data, error } = await this.supabase.getClient().auth.signUp({
@@ -19,7 +23,11 @@ export class AuthService {
     });
 
     if (error) throw new Error(error.message);
-    return { user: data.user, session: data.session };
+    
+    const payload = { email: data.user.email, sub: data.user.id };
+    const access_token = this.jwtService.sign(payload);
+    
+    return { user: data.user, access_token };
   }
 
   async login(loginDto: LoginDto) {
@@ -29,6 +37,10 @@ export class AuthService {
     });
 
     if (error) throw new Error(error.message);
-    return { user: data.user, session: data.session };
+    
+    const payload = { email: data.user.email, sub: data.user.id };
+    const access_token = this.jwtService.sign(payload);
+    
+    return { user: data.user, access_token };
   }
 }

@@ -47,6 +47,13 @@ export class WorkflowsService {
     }
 
     async deleteWorkflow(id: string) {
+        // Delete workflow step edges first
+        await this.supabase.getClient().from('workflow_step_edges').delete().eq('workflow_id', id);
+        
+        // Delete workflow steps
+        await this.supabase.getClient().from('workflow_steps').delete().eq('workflow_id', id);
+        
+        // Delete workflow
         const {data, error} = await this.supabase.getClient().from('workflows').delete().eq('id', id);
         if (error) throw new Error(error.message);
         return { data };
